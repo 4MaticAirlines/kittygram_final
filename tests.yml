@@ -1,4 +1,4 @@
 repo_owner: 4MaticAirlines
-kittygram_domain: https://molodtsov1.sytes.net
-taski_domain: https://molodtsov.sytes.net
+kittygram_domain: http://localhost:9000  # Локальный Kittygram (frontend)
+taski_domain: http://localhost:8000
 dockerhub_username: alexandermolodtsov
