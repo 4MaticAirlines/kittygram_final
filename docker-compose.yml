@@ -14,12 +14,20 @@ services:
 
   backend:
     build: ./backend/
+    image: alexandermolodtsov/kittygram_backend
     env_file: .env
     volumes:
       - static:/app/static
       - media:/app/media
+    ports:
+      - "8000:8000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --no-input &&
+             gunicorn --bind 0.0.0.0:8000 kittygram_backend.wsgi"
 
   frontend:
     build: ./frontend/
