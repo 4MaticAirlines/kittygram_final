@@ -1,0 +1,19 @@
+[flake8]
+# Игнорируем все D-правила (docstring)
+ignore = D100, D101, D102, D103, D104, D105, D106
+
+# Игнорируем I-правила (isort)
+extend-ignore = I
+
+# Игнорируем N806 (переменные в camelCase)
+extend-ignore = N806
+
+# Игнорируем E302 (ожидалось 2 пустые строки)
+extend-ignore = E302
+
+# Исключаем проверку миграций
+exclude =
+    */migrations/*,
+    .git,
+    __pycache__,
+    */settings/*
