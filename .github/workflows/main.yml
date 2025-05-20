@@ -124,6 +124,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/${{ secrets.SSH_USERNAME }}/kittygram
+            echo "${{ secrets.ENV_FILE }}" > .env
             docker-compose -f docker-compose.production.yml down
             docker-compose -f docker-compose.production.yml pull
             docker-compose -f docker-compose.production.yml up -d
