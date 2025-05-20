@@ -140,6 +140,5 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            ✅ Деплой Kittygram завершен!
             • Backend: ${{ env.DOCKERHUB_USERNAME }}/kittygram_backend
             • Frontend: ${{ env.DOCKERHUB_USERNAME }}/kittygram_frontend
