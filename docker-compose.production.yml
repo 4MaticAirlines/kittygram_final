@@ -17,10 +17,16 @@ services:
     restart: unless-stopped
     networks:
       - kittygram_net
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --no-input &&
+             gunicorn --bind 0.0.0.0:8000 kittygram_backend.wsgi"
 
   db:
     image: postgres:13.10
     env_file: .env
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust  # Для упрощения деплоя
     volumes:
       - pg_data_production:/var/lib/postgresql/data
     restart: unless-stopped
@@ -30,12 +36,13 @@ services:
   frontend:
     image: alexandermolodtsov/kittygram_frontend
     env_file: .env
-    command: >
-      sh -c "while true; do sleep 86400; done"  # Замена команды на бесконечное ожидание
     volumes:
       - static_volume:/frontend_static
     networks:
       - kittygram_net
+    command: >
+      sh -c "cp -r /app/build/. /frontend_static/ && 
+             tail -f /dev/null"  # Копирование статики + вечный процесс
 
   gateway:
     image: alexandermolodtsov/kittygram_gateway
@@ -51,6 +58,7 @@ services:
     restart: unless-stopped
     networks:
       - kittygram_net
+    command: "nginx -g 'daemon off;'"  # Запуск nginx в foreground
 
 networks:
   kittygram_net:
