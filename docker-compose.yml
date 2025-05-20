@@ -53,6 +53,7 @@ services:
     volumes:
       - static:/static
       - media:/media
+      - ./certs:/etc/nginx/ssl
     depends_on:
       - backend
       - frontend
