@@ -10,7 +10,7 @@ services:
     image: postgres:13
     env_file: .env
     environment:
-      POSTGRES_HOST_AUTH_METHOD: trust  # Добавляем для быстрого старта
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
