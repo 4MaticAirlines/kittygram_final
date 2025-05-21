@@ -1,3 +1,32 @@
+version: '3'
+
+volumes:
+  pg_data:
+  static:
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+  backend:
+    build: ./backend/
+    env_file: .env
+  frontend:
+    env_file: .env
+    build: ./frontend/
+    command: cp -r /app/build/. /static/
+    volumes:
+      - static:/static
+  gateway:
+    build: ./nginx/
+    env_file: .env
+    ports:
+      - 9000:80
+    volumes:
+      - static:/static
+
+"""
 version: '3.8'
 
 services:
@@ -27,21 +56,22 @@ services:
     volumes:
       - static:/frontend_static
     command: sh -c "cp -r /app/build/. /frontend_static/ && sleep infinity"
-    depends_on:
+  #  depends_on:
       - backend
-    restart: always
+#    restart: always
 
-  gateway:
-    image: nginx:latest
-    volumes:
+ # gateway:
+ #   image: nginx:latest
+ #   volumes:
       - static:/staticfiles
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    ports:
+ #   ports:
       - "8000:80"
-    depends_on:
+  #  depends_on:
       - frontend
-    restart: always
-
-volumes:
-  pg_data:
-  static:
+  #  restart: always
+#
+#volumes:
+#  pg_data:
+ # static:
+"""
