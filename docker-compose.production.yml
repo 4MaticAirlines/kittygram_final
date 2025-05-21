@@ -1,46 +1,31 @@
-version: '3.8'
+# docker-compose.production.yml
 
 volumes:
   pg_data_production:
   static_volume:
 
+# Всё отличие — заменяем build на image и указываем, какой образ использовать
 services:
-  backend:
-    image: alexandermolodtsov/kittygram_backend
-    env_file: .env
-    ports:
-      - "8000:8000"
-    restart: unless-stopped
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --no-input &&
-             gunicorn --bind 0.0.0.0:8000 kittygram_backend.wsgi"
-
   db:
     image: postgres:13.10
     env_file: .env
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - pg_data_production:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  frontend:
-    image: alexandermolodtsov/kittygram_frontend
+  backend:
+    image: username/taski_backend # Качаем с Docker Hub
     env_file: .env
     volumes:
+      - static_volume:/backend_static
+  frontend:
+    image: username/taski_frontend  # Качаем с Docker Hub
+    env_file: .env
+    command: cp -r /app/build/. /frontend_static/
+    volumes:
       - static_volume:/frontend_static
-    restart: unless-stopped
-    command: >
-      sh -c "cp -r /app/build/. /frontend_static/ && tail -f /dev/null"
-
   gateway:
-    image: alexandermolodtsov/kittygram_gateway
+    image: username/taski_gateway  # Качаем с Docker Hub
     env_file: .env
     volumes:
       - static_volume:/staticfiles/
     ports:
-      - "80:80"
-      - "443:443"
-    restart: unless-stopped
-    command: "nginx -g 'daemon off;'"
+      - 8000:80
