@@ -10,18 +10,21 @@ services:
     volumes:
       - pg_data_production:/var/lib/postgresql/data
   backend:
+    platform: linux/amd64
     image: alexandermolodtsov/kittygram_backend
     env_file: .env
     restart: always
     ports:
       - "8000:8000"
   frontend:
+    platform: linux/amd64
     image: alexandermolodtsov/kittygram_frontend
     env_file: .env
     restart: always
     ports:
       - "80:80"
   gateway:
+    platform: linux/amd64
     image: alexandermolodtsov/kittygram_gateway
     env_file: .env
     restart: always
