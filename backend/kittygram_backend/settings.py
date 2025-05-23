@@ -1,4 +1,3 @@
-# flake8: noqa
 import os
 from pathlib import Path
 
@@ -9,7 +8,7 @@ SECRET_KEY = 'django-insecure-cg6*%6d51ef8f#4!r3*$vmxm4)abgjw8mo!4y-q*uq1!4$-89$
 DEBUG = False
 ALLOWED_HOSTS = ['*']
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'molodtsov1.sytes.net']
 
 INSTALLED_APPS = [
