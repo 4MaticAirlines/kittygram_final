@@ -1,34 +1,27 @@
+version: '3'
+
+volumes:
+  pg_data:
+  static:
+
 services:
   db:
     image: postgres:13
     volumes:
       - pg_data:/var/lib/postgresql/data
-
   backend:
-    build: ./backend
+    build: ./backend/
     env_file: .env
-    volumes:
-      - static:/app/static
-    depends_on:
-      - db
-    command: sh -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 backend.wsgi"
-
   frontend:
-    build: ./frontend
-    volumes:
-      - static:/app/static
-
-  gateway:
-    build: ./nginx
-    ports:
-      - "8080:80"
-      - "8443:443"
+    env_file: .env
+    build: ./frontend/
+    command: cp -r /app/build/. /static/
     volumes:
       - static:/static
-    depends_on:
-      - backend
-      - frontend
-
-volumes:
-  pg_data:
-  static:
+  gateway:
+    build: ./nginx/
+    env_file: .env
+    ports:
+      - 9000:80
+    volumes:
+      - static:/static
