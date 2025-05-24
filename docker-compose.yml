@@ -1,27 +1,64 @@
-version: '3'
-
-volumes:
-  pg_data:
-  static:
+version: '3.8'
 
 services:
   db:
     image: postgres:13
+    restart: always
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: kittygram
+      POSTGRES_USER: kittygram_user
+      POSTGRES_PASSWORD: kittygram_password
+
   backend:
-    build: ./backend/
-    env_file: .env
-  frontend:
-    env_file: .env
-    build: ./frontend/
-    command: cp -r /app/build/. /static/
-    volumes:
-      - static:/static
-  gateway:
-    build: ./nginx/
-    env_file: .env
+    build: ./backend
+    command: gunicorn kittygram_backend.wsgi:application --bind 0.0.0.0:8000
     ports:
-      - 9000:80
+      - "8000:8000"
     volumes:
-      - static:/static
+      - static:/app/static/
+      - media:/app/media/
+    environment:
+      DEBUG: '0'
+      SECRET_KEY: 'ghho)y%%ussvqsam6#ra=)%b(6-i646=5st6!)5@2il(l&)h4h'
+      ALLOWED_HOSTS: molodtsov1.sytes.net
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: kittygram
+      POSTGRES_USER: kittygram_user
+      POSTGRES_PASSWORD: kittygram_password
+      DB_HOST: db
+      DB_PORT: '5432'
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    command: sh -c "cp -r /app/build/. /static/ && tail -f /dev/null"
+    volumes:
+      - static:/static/
+    environment:
+      ALLOWED_HOSTS: molodtsov1.sytes.net
+    depends_on:
+      - backend
+
+  gateway:
+    build: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - static:/app/static/
+      - media:/app/media/
+    depends_on:
+      - backend
+      - frontend
+    environment:
+      ALLOWED_HOSTS: molodtsov1.sytes.net
+      DEBUG: '0'
+      SECRET_KEY: 'ghho)y%%ussvqsam6#ra=)%b(6-i646=5st6!)5@2il(l&)h4h'
+
+volumes:
+  static:
+  media:
+  pg_data:
