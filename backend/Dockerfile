@@ -1,18 +1,13 @@
-FROM python:3.9-slim
+FROM python:3.9
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
+# Установка зависимостей
 RUN pip install --upgrade pip && \
-    pip install cython==0.29.36
+    pip install gunicorn==20.1.0
 
 COPY requirements.txt .
-
-RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install -r requirements.txt
 
 COPY . .
 
