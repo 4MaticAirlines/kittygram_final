@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    env_file: .env
+
+  backend:
+    image: alexandermolodtsov/kittygram:latest
+    env_file: .env
+    depends_on:
+      - db
+    volumes:
+      - static_volume:/app/static/
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn kittygram_final.wsgi:application --bind 0.0.0.0:8000"
+
+volumes:
+  pg_data:
+  static_volume:
