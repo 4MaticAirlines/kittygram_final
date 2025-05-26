@@ -7,7 +7,27 @@ SECRET_KEY = 'django-insecure-cg6*%6d51ef8f#4!r3*$vmxm4)abgjw8mo!4y-q*uq1!4$-89$
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
+ALLOWED_HOSTS = [
+    'molodtsov1.sytes.net',
+    'localhost',
+    '127.0.0.1',
+    '[::1]',
+    '84.201.160.59',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -26,7 +46,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+#    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -103,14 +123,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated', 
+        'rest_framework.permissions.IsAuthenticated',
     ],
-
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
-
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+}
 
+DJOSER = {
+    'PERMISSIONS': {
+        'user_create': ['rest_framework.permissions.AllowAny'],  # регистрация должна быть открыта
+        'user_list': ['rest_framework.permissions.IsAuthenticated'],  # просмотр списка — только аутентифицированным
+        'user': ['rest_framework.permissions.IsAuthenticated'],
+    },
+    'SERIALIZERS': {},
 }
