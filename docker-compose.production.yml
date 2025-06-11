@@ -21,14 +21,14 @@ services:
   frontend:
     image: alexandermolodtsov/kittygram_frontend:latest
     volumes:
-      - static:/static
+      - static:/app/static_files
     depends_on:
       - backend
 
   gateway:
     image: alexandermolodtsov/kittygram_gateway:latest
     volumes:
-      - static:/static
+      - static:/app/static_files
       - media:/media
     ports:
       - "9000:9000"
