@@ -21,7 +21,7 @@ services:
   frontend:
     image: alexandermolodtsov/kittygram_frontend:latest
     volumes:
-      - static:/app/static
+      - static:/static
     depends_on:
       - backend
 
