@@ -9,13 +9,19 @@ router = routers.DefaultRouter()
 router.register(r'cats', CatViewSet)
 router.register(r'achievements', AchievementViewSet)
 
+api_urlpatterns = [
+    path('', include(router.urls)),
+    path('', include('djoser.urls')),
+    path('', include('djoser.urls.authtoken')),
+]
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('api/auth/', include('djoser.urls')),
-    path('api/auth/', include('djoser.urls.authtoken')),
+    path('api/', include(api_urlpatterns)),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )

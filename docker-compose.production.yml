@@ -1,22 +1,42 @@
 version: '3.8'
 
 services:
-  backend:
-    image: alexandermolodtsov/kittygram_backend
-    restart: always
+  db:
+    image: postgres:13
+    volumes:
+      - pg_data:/var/lib/postgresql/data
     env_file:
-      - ./infra/.env
-    ports:
-      - "8000:8000"
+      - .env
+
+  backend:
+    image: alexandermolodtsov/kittygram_backend:latest
+    volumes:
+      - static:/app/static
+      - media:/app/media
+    env_file:
+      - .env
+    depends_on:
+      - db
 
   frontend:
-    image: alexandermolodtsov/kittygram_frontend
-    restart: always
-    ports:
-      - "80:80"
+    image: alexandermolodtsov/kittygram_frontend:latest
+    volumes:
+      - static:/app/static
+    depends_on:
+      - backend
 
   gateway:
-    image: alexandermolodtsov/kittygram_gateway
-    restart: always
+    image: alexandermolodtsov/kittygram_gateway:latest
+    volumes:
+      - static:/static
+      - media:/media
     ports:
-      - "1337:1337"
+      - "9000:9000"
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  pg_data:
+  static:
+  media:

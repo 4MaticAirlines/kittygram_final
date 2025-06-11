@@ -3,63 +3,40 @@ version: '3.8'
 services:
   db:
     image: postgres:13
-    restart: always
     volumes:
-      - pg_data:/var/lib/postgresql/data/
-    environment:
-      POSTGRES_DB: kittygram
-      POSTGRES_USER: kittygram_user
-      POSTGRES_PASSWORD: kittygram_password
+      - pg_data:/var/lib/postgresql/data
+    env_file:
+      - .env
 
   backend:
-    build: ./backend
-    command: gunicorn kittygram_backend.wsgi:application --bind 0.0.0.0:8000
-    ports:
-      - "8000:8000"
+    image: alexandermolodtsov/kittygram_backend
     volumes:
-      - static:/app/static/
-      - media:/app/media/
-    environment:
-      DEBUG: '0'
-      SECRET_KEY: 'ghho)y%%ussvqsam6#ra=)%b(6-i646=5st6!)5@2il(l&)h4h'
-      ALLOWED_HOSTS: molodtsov1.sytes.net
-      DB_ENGINE: django.db.backends.postgresql
-      DB_NAME: kittygram
-      POSTGRES_USER: kittygram_user
-      POSTGRES_PASSWORD: kittygram_password
-      DB_HOST: db
-      DB_PORT: '5432'
+      - static:/app/static
+      - media:/app/media
+    env_file:
+      - .env
     depends_on:
       - db
 
   frontend:
-    build: ./frontend
-    command: sh -c "cp -r /app/build/. /static/ && tail -f /dev/null"
+    image: alexandermolodtsov/kittygram_frontend
     volumes:
-      - static:/static/
-    environment:
-      ALLOWED_HOSTS: molodtsov1.sytes.net
+      - static:/app/static
     depends_on:
       - backend
 
   gateway:
-    build: ./nginx
-    ports:
-      - "8080:80"
-      - "8443:443"
+    image: alexandermolodtsov/kittygram_gateway
     volumes:
-      - static:/app/static/
-      - media:/app/media/
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - static:/static
+      - media:/media
+    ports:
+      - "9000:9000"
     depends_on:
       - backend
       - frontend
-    environment:
-      ALLOWED_HOSTS: molodtsov1.sytes.net
-      DEBUG: '0'
-      SECRET_KEY: 'ghho)y%%ussvqsam6#ra=)%b(6-i646=5st6!)5@2il(l&)h4h'
 
 volumes:
+  pg_data:
   static:
   media:
-  pg_data:
