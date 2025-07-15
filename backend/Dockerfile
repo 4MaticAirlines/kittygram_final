@@ -4,4 +4,4 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 RUN apt-get update && apt-get install -y postgresql-client
 COPY . .
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "kittygram_backend.wsgi"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "kittygram.wsgi"]
