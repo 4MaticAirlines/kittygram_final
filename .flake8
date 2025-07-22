@@ -1,18 +1,16 @@
 [flake8]
-# Основные игнорируемые правила
 ignore =
-    D100,  # Missing docstring in public module
-    D101,  # Missing docstring in public class
-    D102,  # Missing docstring in public method
-    D103,  # Missing docstring in public function
-    D104,  # Missing docstring in public package
-    D105,  # Missing docstring in magic method
-    D106,  # Missing docstring in public nested class
-    I,     # isort issues
-    N806,  # variable should be lowercase
-    E302   # expected 2 blank lines
+    D100,
+    D101,
+    D102,
+    D103,
+    D104,
+    D105,
+    D106,
+    I,
+    N806,
+    E302
 
-# Исключаемые директории
 exclude =
     */migrations/*,
     .git,
@@ -20,8 +18,5 @@ exclude =
     */settings/*,
     */venv/*
 
-# Максимальная длина строки
 max-line-length = 88
-
-# Разрешить переносы строк в скобках
 max-complexity = 10
