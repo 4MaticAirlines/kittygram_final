@@ -61,7 +61,7 @@ jobs:
         with:
           node-version: 16
 
-      - name: Install frontend dependencies
+      - name: Install dependencies
         run: |
           cd frontend && npm ci
 
@@ -81,11 +81,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build frontend (production)
-        run: |
-          npm install --prefix frontend
-          npm run build --prefix frontend
-
       - name: Build and push backend
         uses: docker/build-push-action@v4
         with:
@@ -99,6 +94,11 @@ jobs:
           context: frontend
           push: true
           tags: ${{ env.DOCKERHUB_USERNAME }}/kittygram_frontend:latest
+
+      - name: Build frontend for gateway
+        run: |
+          npm ci --prefix frontend
+          npm run build --prefix frontend
 
       - name: Build and push gateway
         uses: docker/build-push-action@v4
