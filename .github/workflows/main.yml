@@ -1,40 +1,90 @@
-name: Main Workflow
+name: Kittygram CI/CD
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  tests:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: '3.9'
       - name: Install dependencies
         run: |
+          pip install -r backend/requirements.txt
+          npm install --prefix frontend
+      - name: Check PEP8
+        run: |
           pip install flake8
-      - name: Run flake8
-        run: flake8 kittygram_final/
+          flake8 backend/
+      - name: Run backend tests
+        run: python backend/manage.py test
+      - name: Run frontend tests
+        run: npm test --prefix frontend
 
-  build_and_push:
+  build-and-push:
+    needs: test
     runs-on: ubuntu-latest
-    needs: tests
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to DockerHub
+      - uses: actions/checkout@v3
+      - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build and Push
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push backend
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./backend
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/kittygram:latest
+          tags: alexandermolodtsov/kittygram_backend:latest
+      - name: Build and push frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: true
+          tags: alexandermolodtsov/kittygram_frontend:latest
+      - name: Build and push gateway
+        uses: docker/build-push-action@v4
+        with:
+          context: ./nginx
+          push: true
+          tags: alexandermolodtsov/kittygram_gateway:latest
 
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "docker-compose.production.yml,.env"
+          target: "~/kittygram"
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/kittygram
+            docker-compose -f docker-compose.production.yml down
+            docker-compose -f docker-compose.production.yml pull
+            docker-compose -f docker-compose.production.yml up -d
+            docker-compose -f docker-compose.production.yml exec backend python manage.py migrate
+            docker-compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
+      - name: Notify Telegram
+        uses: appleboy/telegram-action@v0.1.1
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: "Kittygram deployed successfully!"
