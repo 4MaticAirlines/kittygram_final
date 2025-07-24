@@ -122,7 +122,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "docker-compose.production.yml,.env"
           target: "/home/${{ env.SSH_USERNAME }}/kittygram/"
-          strip_components: 1
+          strip_components: 0
 
       - name: Deploy application
         uses: appleboy/ssh-action@v0.1.10
