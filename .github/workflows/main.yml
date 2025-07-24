@@ -98,7 +98,7 @@ jobs:
       - name: Build frontend for gateway
         run: |
           npm ci --prefix frontend
-          npm run build --prefix frontend
+          CI=false npm run build --prefix frontend
 
       - name: Build and push gateway
         uses: docker/build-push-action@v4
