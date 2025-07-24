@@ -98,7 +98,7 @@ jobs:
       - name: Build frontend for gateway
         run: |
           npm ci --prefix frontend
-          npm run build --prefix frontend
+          CI=false npm run build --prefix frontend
 
       - name: Build and push gateway
         uses: docker/build-push-action@v4
@@ -122,7 +122,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "docker-compose.production.yml,.env"
           target: "/home/${{ env.SSH_USERNAME }}/kittygram/"
-          strip_components: 1
+          strip_components: 0
 
       - name: Deploy application
         uses: appleboy/ssh-action@v0.1.10
