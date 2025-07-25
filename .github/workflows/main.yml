@@ -121,7 +121,7 @@ jobs:
           username: ${{ env.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "docker-compose.production.yml,.env"
-          target: "/home/${{ env.SSH_USERNAME }}/kittygram/"
+          target: "/home/${{ env.SSH_USERNAME }}/kittygram_final/"
           strip_components: 0
 
       - name: Deploy application
@@ -131,7 +131,7 @@ jobs:
           username: ${{ env.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/${{ env.SSH_USERNAME }}/kittygram
+            cd /home/${{ env.SSH_USERNAME }}/kittygram_final
             docker-compose -f docker-compose.production.yml down
             docker-compose -f docker-compose.production.yml pull
             docker-compose -f docker-compose.production.yml up -d
