@@ -27,9 +27,6 @@ services:
 
   gateway:
     image: alexandermolodtsov/kittygram_gateway:latest
-    volumes:
-      - static:/app/static
-      - media:/media
     ports:
       - "9000:9000"
     depends_on:
